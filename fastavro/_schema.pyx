@@ -5,7 +5,6 @@ from os import path
 from copy import deepcopy
 import json
 
-from ._six import iteritems
 from ._schema_common import (
     PRIMITIVES, UnknownType, SchemaParseException, RESERVED_PROPERTIES,
     OPTIONAL_FIELD_PROPERTIES, RESERVED_FIELD_PROPERTIES,
@@ -69,7 +68,7 @@ def parse_schema(
             schema, "", expand, _write_hint, set(), _named_schemas
         )
     elif isinstance(schema, dict) and "__fastavro_parsed" in schema:
-        for key, value in iteritems(schema["__named_schemas"]):
+        for key, value in schema["__named_schemas"].items():
             _named_schemas[key] = value
         return schema
     elif isinstance(schema, list):
@@ -123,7 +122,7 @@ cdef _parse_schema(schema, namespace, expand, _write_hint, names, named_schemas)
 
         parsed_schema = {
             key: value
-            for key, value in iteritems(schema)
+            for key, value in schema.items()
             if key not in RESERVED_PROPERTIES
         }
         parsed_schema["type"] = schema_type
@@ -219,7 +218,7 @@ cdef _parse_schema(schema, namespace, expand, _write_hint, names, named_schemas)
                 # reference. Using deepcopy is pretty slow, and we don't need a
                 # true deepcopy so this works good enough
                 named_schemas[fullname] = {
-                    k: v for k, v in iteritems(parsed_schema)
+                    k: v for k, v in parsed_schema.items()
                 }
 
                 parsed_schema["__fastavro_parsed"] = True
@@ -237,7 +236,7 @@ cdef _parse_schema(schema, namespace, expand, _write_hint, names, named_schemas)
 cdef parse_field(field, namespace, expand, names, named_schemas):
     parsed_field = {
         key: value
-        for key, value in iteritems(field)
+        for key, value in field.items()
         if key not in RESERVED_FIELD_PROPERTIES
     }
 
